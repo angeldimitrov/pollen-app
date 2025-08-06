@@ -73,6 +73,13 @@ function App(): React.JSX.Element {
     setAppError(error.message);
   }, []);
 
+  // Custom hooks for data management with stable callbacks
+  const locationHook = useLocation({
+    autoDetect: true,
+    onLocationChange,
+    onError: onLocationError,
+  });
+
   const onCitySelect = useCallback(async (city: City) => {
     console.log('🏙️ City selected:', city);
     
@@ -91,13 +98,6 @@ function App(): React.JSX.Element {
       setAppError('Failed to update location. Please try again.');
     }
   }, [locationHook]);
-  
-  // Custom hooks for data management with stable callbacks
-  const locationHook = useLocation({
-    autoDetect: true,
-    onLocationChange,
-    onError: onLocationError,
-  });
   
   const sensitivity = useSensitivity({
     autoSave: true,

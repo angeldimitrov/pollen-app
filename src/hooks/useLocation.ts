@@ -257,48 +257,6 @@ export function useLocation(options: {
     }
   }, [state.settings, updateState, setError, setLocation]);
 
-  /**
-   * Sets location from Google Maps city selection
-   * 
-   * Converts City object from Maps API to Location format
-   * and updates the current location state.
-   */
-  const setCityLocation = useCallback(async (city: City) => {
-    updateState({ isLoading: true, error: null });
-    
-    try {
-      // Convert City to Location format
-      const location: Location = {
-        latitude: city.coordinates.lat,
-        longitude: city.coordinates.lng,
-        displayName: city.name,
-        formattedAddress: city.formattedAddress,
-        source: 'manual',
-        timestamp: new Date(),
-        accuracy: null, // Manual selections don't have accuracy
-      };
-      
-      setLocation(location);
-      
-      // Update location settings with manual selection flag
-      const newSettings = {
-        ...state.settings,
-        current: location,
-        useAutoDetection: false, // User manually selected, disable auto-detection
-      };
-      updateState({ settings: newSettings });
-      saveLocationSettings(newSettings);
-      
-      // Also save this city to user's saved locations for quick access
-      saveLocation(location, city.name);
-      
-    } catch (error) {
-      const locationError = createLocationError(
-        error instanceof Error ? error.message : 'Failed to set city location'
-      );
-      setError(locationError);
-    }
-  }, [state.settings, updateState, setError, setLocation, saveLocation]);
   
   /**
    * Toggles automatic location detection
@@ -351,6 +309,49 @@ export function useLocation(options: {
     updateState({ settings: newSettings });
     saveLocationSettings(newSettings);
   }, [state.settings, updateState]);
+
+  /**
+   * Sets location from Google Maps city selection
+   * 
+   * Converts City object from Maps API to Location format
+   * and updates the current location state.
+   */
+  const setCityLocation = useCallback(async (city: City) => {
+    updateState({ isLoading: true, error: null });
+    
+    try {
+      // Convert City to Location format
+      const location: Location = {
+        latitude: city.coordinates.lat,
+        longitude: city.coordinates.lng,
+        displayName: city.name,
+        formattedAddress: city.formattedAddress,
+        source: 'manual',
+        timestamp: new Date(),
+        accuracy: null, // Manual selections don't have accuracy
+      };
+      
+      setLocation(location);
+      
+      // Update location settings with manual selection flag
+      const newSettings = {
+        ...state.settings,
+        current: location,
+        useAutoDetection: false, // User manually selected, disable auto-detection
+      };
+      updateState({ settings: newSettings });
+      saveLocationSettings(newSettings);
+      
+      // Also save this city to user's saved locations for quick access
+      saveLocation(location, city.name);
+      
+    } catch (error) {
+      const locationError = createLocationError(
+        error instanceof Error ? error.message : 'Failed to set city location'
+      );
+      setError(locationError);
+    }
+  }, [state.settings, updateState, setError, setLocation, saveLocation]);
   
   /**
    * Removes a saved location by index

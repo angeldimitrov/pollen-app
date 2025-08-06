@@ -48,7 +48,7 @@ export function LocationCard({
 
   const getLocationSource = () => {
     if (!location) return null;
-    return location.source === 'gps' ? '📍 GPS' : '🏙️ Manual';
+    return location.source === 'auto' ? '📍 GPS' : '🏙️ Manual';
   };
 
   if (isLoading) {
@@ -90,7 +90,7 @@ export function LocationCard({
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <span className="text-lg">
-                  {location.source === 'gps' ? '📍' : '🏙️'}
+                  {location.source === 'auto' ? '📍' : '🏙️'}
                 </span>
                 <span className="font-medium text-gray-900">
                   {getCurrentLocationName()}
