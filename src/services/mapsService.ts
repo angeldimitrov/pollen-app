@@ -93,9 +93,9 @@ export async function searchCities(query: string, limit: number = 5): Promise<Ci
   }
 
   try {
-    // Use Text Search API to find cities
+    // Use Text Search API via Vite proxy to avoid CORS issues
     // Focus on locality/administrative_area types for better pollen coverage
-    const url = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
+    const url = new URL('/api/maps/places/textsearch/json', window.location.origin);
     url.searchParams.set('query', `${query.trim()} city`);
     url.searchParams.set('type', 'locality');
     url.searchParams.set('key', API_KEY);
@@ -181,7 +181,8 @@ export async function getCityCoordinates(cityName: string): Promise<City> {
   }
 
   try {
-    const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+    // Use Geocoding API via Vite proxy to avoid CORS issues
+    const url = new URL('/api/maps/geocode/json', window.location.origin);
     url.searchParams.set('address', cityName.trim());
     url.searchParams.set('key', API_KEY);
 
