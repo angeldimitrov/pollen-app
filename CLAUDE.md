@@ -308,6 +308,19 @@ chore: maintenance tasks
 - **hotfix/**: Urgent production fixes
 - **Create always a new branch for feature and fixes.**
 
+## Development Workflow Tips
+
+### Git and CLI Tools
+- Always use github cli instead of git command where possible
+
+## Development Notes
+- To test in the browser use playwright mcp. Always test frontend changes after implementing!!!
+
+## Documentation Best Practices
+
+### Documentation Context
+- **For documentation, always use context7 mcp**
+
 ## Resources & Documentation
 
 ### Essential Links
@@ -347,6 +360,11 @@ If you encounter issues not covered in this document:
 2. Review Google Pollen API documentation
 3. Consult React and Vite documentation
 4. Check GitHub issues for similar problems
+
+## Development Constraints
+
+### Critical Reminder
+- **please do not use mock data!!! no fallbacks!!!**
 
 ---
 
