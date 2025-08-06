@@ -22,7 +22,9 @@ import { Location } from '../types/user';
  * Configuration for Google Pollen API
  */
 const POLLEN_API_CONFIG = {
-  baseUrl: import.meta.env.VITE_POLLEN_API_BASE || 'https://pollen.googleapis.com/v1',
+  baseUrl: import.meta.env.DEV 
+    ? '/api/pollen' // Use dev proxy to bypass CORS
+    : import.meta.env.VITE_POLLEN_API_BASE || 'https://pollen.googleapis.com/v1',
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   defaultDays: 3, // MVP shows current + 2 forecast days
   timeout: 10000, // 10 second timeout for mobile networks
@@ -140,13 +142,17 @@ async function withRetry<T>(
 
 /**
  * Builds the complete URL for pollen forecast API requests
+ * Google Pollen API uses GET method with query parameters
  * @param request - The pollen request parameters
  * @returns Complete API URL with query parameters
  */
 function buildPollenUrl(request: PollenRequest): string {
   const params = new URLSearchParams({
     key: POLLEN_API_CONFIG.apiKey!,
-    // Location is sent in request body for POST requests
+    // Location coordinates as query parameters for GET requests
+    'location.latitude': request.location.latitude.toString(),
+    'location.longitude': request.location.longitude.toString(),
+    days: request.days.toString(),
   });
   
   if (request.plantsDescription) {
@@ -170,18 +176,18 @@ function buildPollenUrl(request: PollenRequest): string {
  * @param dailyInfo - Raw daily info from API
  * @returns Daily info with proper Date objects
  */
-function transformApiResponse(dailyInfo: any[]): DailyPollenInfo[] {
+function transformApiResponse(dailyInfo: Record<string, unknown>[]): DailyPollenInfo[] {
   return dailyInfo.map(day => ({
     ...day,
-    date: new Date(day.date),
-  }));
+    date: new Date(day.date as string),
+  })) as DailyPollenInfo[];
 }
 
 /**
  * Fetches pollen forecast data from Google Pollen API
  * 
  * Implementation Details:
- * - Makes POST request as required by Google Pollen API
+ * - Makes GET request as required by Google Pollen API
  * - Includes automatic retry logic with exponential backoff
  * - No caching as per MVP requirements
  * - Returns structured data ready for risk calculation
@@ -220,12 +226,6 @@ export async function fetchPollenForecast(
     
     const url = buildPollenUrl(request);
     
-    // Create request body as required by Google Pollen API
-    const requestBody = {
-      location: request.location,
-      days: request.days,
-    };
-    
     // Implement request with timeout and retry logic
     const response = await withRetry(async () => {
       const controller = new AbortController();
@@ -238,11 +238,11 @@ export async function fetchPollenForecast(
       
       try {
         const response = await fetch(url, {
-          method: 'POST',
+          method: 'GET',
           headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(requestBody),
           signal: controller.signal,
         });
         

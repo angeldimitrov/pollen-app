@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Test - Pollen Tracker</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+        .device-frame {
+            max-width: 375px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .controls {
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: none;
+            background: #007AFF;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Pollen Tracker - Mobile Test</h2>
+        <p>Testing the app in different mobile viewport sizes</p>
+        <button onclick="setSize(320, 568)">iPhone SE</button>
+        <button onclick="setSize(375, 812)">iPhone 12/13</button>
+        <button onclick="setSize(414, 896)">iPhone 14 Plus</button>
+        <button onclick="setSize(360, 640)">Android</button>
+    </div>
+    
+    <div class="device-frame" id="deviceFrame">
+        <iframe id="appFrame" src="http://localhost:4173"></iframe>
+    </div>
+    
+    <div class="info">
+        <h3>Mobile Testing Checklist</h3>
+        <ul>
+            <li>✅ Components load without API key</li>
+            <li>✅ Touch targets are 44px minimum</li>
+            <li>✅ Text is readable (16px minimum)</li>
+            <li>✅ Navigation is accessible</li>
+            <li>✅ PWA manifest loads correctly</li>
+            <li>⚠️ API integration needs real key for full test</li>
+        </ul>
+    </div>
+
+    <script>
+        function setSize(width, height) {
+            const frame = document.getElementById('deviceFrame');
+            frame.style.maxWidth = width + 'px';
+            frame.style.height = height + 'px';
+            
+            const iframe = document.getElementById('appFrame');
+            iframe.style.height = height + 'px';
+        }
+        
+        // Default to iPhone 12/13 size
+        setSize(375, 812);
+    </script>
+</body>
+</html>

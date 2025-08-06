@@ -292,7 +292,7 @@ export function useSensitivity(options: {
         onSaveComplete?.(false);
         return false;
       }
-    } catch (error) {
+    } catch {
       setError('Unable to save settings. Please check your browser storage.');
       updateState({ isSaving: false });
       onSaveComplete?.(false);

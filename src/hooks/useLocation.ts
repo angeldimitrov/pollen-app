@@ -26,7 +26,6 @@ import {
   loadLocationSettings,
   calculateDistance,
   createLocationError,
-  LocationErrorType,
 } from '../services/locationService';
 
 /**
@@ -399,12 +398,15 @@ export function useLocation(options: {
    * Cleanup on unmount
    */
   useEffect(() => {
+    const abortController = abortControllerRef.current;
+    const permissionTimer = permissionTimerRef.current;
+    
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      if (abortController) {
+        abortController.abort();
       }
-      if (permissionTimerRef.current) {
-        clearInterval(permissionTimerRef.current);
+      if (permissionTimer) {
+        clearInterval(permissionTimer);
       }
     };
   }, []);
