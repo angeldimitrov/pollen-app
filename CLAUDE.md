@@ -308,6 +308,19 @@ chore: maintenance tasks
 - **hotfix/**: Urgent production fixes
 - **Create always a new branch for feature and fixes.**
 
+## Development Workflow Tips
+
+### Git and CLI Tools
+- Always use github cli instead of git command where possible
+
+## Development Notes
+- To test in the browser use playwright mcp. Always test frontend changes after implementing!!!
+
+## Documentation Best Practices
+
+### Documentation Context
+- **For documentation, always use context7 mcp**
+
 ## Resources & Documentation
 
 ### Essential Links
