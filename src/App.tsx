@@ -6,7 +6,7 @@
  * Implements mobile-first navigation with tab-based interface
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layout } from './components/common/Layout';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { Forecast } from './components/Forecast/Forecast';
@@ -16,6 +16,8 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { useLocation } from './hooks/useLocation';
 import { usePollenData } from './hooks/usePollenData';
 import { useSensitivity } from './hooks/useSensitivity';
+import { Location, LocationError, SensitivityProfile } from './types/user';
+import { PollenError } from './types/pollen';
 
 /**
  * App navigation views
@@ -33,47 +35,86 @@ function App(): React.JSX.Element {
   // App-level error state
   const [appError, setAppError] = useState<string | null>(null);
   
-  // Custom hooks for data management
+  // Refs to store hook instances for stable callbacks
+  const pollenHookRef = useRef<ReturnType<typeof usePollenData> | null>(null);
+  const sensitivityRef = useRef<ReturnType<typeof useSensitivity> | null>(null);
+  
+  // Stable callbacks to prevent infinite loops
+  const onLocationChange = useCallback((location: Location) => {
+    console.log('📍 Location changed:', location);
+    // Refresh pollen data when location changes significantly
+    if (pollenHookRef.current?.needsRefresh(location)) {
+      pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
+        tree: 5,
+        grass: 5, 
+        weed: 5
+      });
+    }
+  }, []);
+  
+  const onLocationError = useCallback((error: LocationError) => {
+    console.error('Location error:', error);
+    // Don't show location errors as app-level errors - let components handle them
+  }, []);
+  
+  const onSensitivityChange = useCallback((newSensitivity: SensitivityProfile) => {
+    console.log('⚙️ Sensitivity changed:', newSensitivity);
+    // Recalculate pollen data when sensitivity changes
+    const location = pollenHookRef.current?.location;
+    if (location) {
+      pollenHookRef.current?.fetchData(location, newSensitivity);
+    }
+  }, []);
+  
+  const onPollenError = useCallback((error: PollenError) => {
+    console.error('Pollen data error:', error);
+    // Show pollen errors as app-level errors since they're critical
+    setAppError(error.message);
+  }, []);
+  
+  // Custom hooks for data management with stable callbacks
   const locationHook = useLocation({
     autoDetect: true,
-    onLocationChange: (location) => {
-      // Refresh pollen data when location changes significantly
-      if (pollenHook.needsRefresh(location)) {
-        pollenHook.fetchData(location, sensitivity.sensitivity);
-      }
-    },
-    onError: (error) => {
-      console.error('Location error:', error);
-      // Don't show location errors as app-level errors - let components handle them
-    },
+    onLocationChange,
+    onError: onLocationError,
   });
   
   const sensitivity = useSensitivity({
     autoSave: true,
-    onSensitivityChange: (newSensitivity) => {
-      // Recalculate pollen data when sensitivity changes
-      if (locationHook.location) {
-        pollenHook.fetchData(locationHook.location, newSensitivity);
-      }
-    },
+    onSensitivityChange,
   });
   
   const pollenHook = usePollenData({
-    onError: (error) => {
-      console.error('Pollen data error:', error);
-      // Show pollen errors as app-level errors since they're critical
-      setAppError(error.message);
-    },
+    onError: onPollenError,
   });
+  
+  // Update refs with current hook instances
+  pollenHookRef.current = pollenHook;
+  sensitivityRef.current = sensitivity;
   
   /**
    * Initial data fetch when location and sensitivity are available
+   * CRITICAL: Only runs if no data fetch is already in progress/completed
    */
   useEffect(() => {
-    if (locationHook.location && !sensitivity.isLoading && !pollenHook.current) {
+    console.log('🎯 App.tsx useEffect triggered:', {
+      hasLocation: !!locationHook.location,
+      sensitivityLoading: sensitivity.isLoading,
+      hasPollenData: !!pollenHook.current,
+      isLoadingOrRefreshing: pollenHook.isLoading || pollenHook.isRefreshing,
+      location: locationHook.location ? `${locationHook.location.latitude}, ${locationHook.location.longitude}` : 'none'
+    });
+    
+    // Only fetch if we have location, sensitivity is loaded, no data exists, and no fetch is in progress
+    if (locationHook.location && 
+        !sensitivity.isLoading && 
+        !pollenHook.current && 
+        !pollenHook.isLoading && 
+        !pollenHook.isRefreshing) {
+      console.log('🚀 Triggering initial data fetch from App.tsx');
       pollenHook.fetchData(locationHook.location, sensitivity.sensitivity);
     }
-  }, [locationHook.location, sensitivity.isLoading, sensitivity.sensitivity, pollenHook]);
+  }, [locationHook.location, sensitivity.isLoading, sensitivity.sensitivity]);
   
   /**
    * Navigation handler
