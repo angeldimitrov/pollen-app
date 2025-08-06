@@ -106,6 +106,7 @@ export function usePollenData(options: {
   autoRefresh?: boolean;
 } = {}): UsePollenDataReturn {
   
+  
   const { 
     onDataUpdate,
     onError,
@@ -133,6 +134,17 @@ export function usePollenData(options: {
     days: number;
   } | null>(null);
   
+  // Ref to track last fetch request to prevent duplicates
+  const lastFetchIdRef = useRef<string | null>(null);
+  
+  // Refs for callbacks to avoid dependencies
+  const onDataUpdateRef = useRef(onDataUpdate);
+  const onErrorRef = useRef(onError);
+  
+  // Keep refs current
+  onDataUpdateRef.current = onDataUpdate;
+  onErrorRef.current = onError;
+  
   /**
    * Updates hook state immutably
    */
@@ -147,13 +159,14 @@ export function usePollenData(options: {
    * Sets error state and notifies error callback
    */
   const setError = useCallback((error: PollenError) => {
-    updateState({ 
+    setState(prevState => ({ 
+      ...prevState,
       error, 
       isLoading: false, 
       isRefreshing: false 
-    });
-    onError?.(error);
-  }, [updateState, onError]);
+    }));
+    onErrorRef.current?.(error);
+  }, []);
   
   /**
    * Processes raw pollen data with user sensitivity
@@ -178,6 +191,17 @@ export function usePollenData(options: {
     sensitivity: SensitivityProfile,
     days: number = POLLEN_DATA_CONFIG.defaultDays
   ) => {
+    // Create unique fetch ID for deduplication
+    const fetchId = `${location.latitude.toFixed(6)}-${location.longitude.toFixed(6)}-${days}-${JSON.stringify(sensitivity)}`;
+    
+    // Prevent duplicate requests with same parameters
+    if (lastFetchIdRef.current === fetchId) {
+      console.log('⚠️  Skipping duplicate fetch request');
+      return;
+    }
+    
+    // Update last fetch ID
+    lastFetchIdRef.current = fetchId;
     // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -186,12 +210,13 @@ export function usePollenData(options: {
     // Create new abort controller
     abortControllerRef.current = new AbortController();
     
-    // Update loading state
-    updateState({
-      isLoading: !state.current, // Show spinner only if no data
-      isRefreshing: !!state.current, // Show refresh indicator if data exists
+    // Update loading state using functional update to avoid state dependency
+    setState(prevState => ({
+      ...prevState,
+      isLoading: !prevState.current, // Show spinner only if no data
+      isRefreshing: !!prevState.current, // Show refresh indicator if data exists
       error: null,
-    });
+    }));
     
     try {
       // Store fetch parameters for retry functionality
@@ -220,7 +245,8 @@ export function usePollenData(options: {
       }
       
       // Update state with new data
-      updateState({
+      setState(prevState => ({
+        ...prevState,
         current: processedData[0] || null,
         forecast: processedData,
         isLoading: false,
@@ -229,24 +255,36 @@ export function usePollenData(options: {
         lastUpdated: new Date(),
         location,
         dataAge: 0,
-      });
+      }));
+      
+      // Clear fetch ID to allow future requests
+      lastFetchIdRef.current = null;
       
       // Notify data update callback
-      onDataUpdate?.(processedData);
+      onDataUpdateRef.current?.(processedData);
       
     } catch (error) {
       // Handle aborted requests
       if (error instanceof Error && error.name === 'AbortError') {
-        updateState({ isLoading: false, isRefreshing: false });
+        setState(prevState => ({ ...prevState, isLoading: false, isRefreshing: false }));
         return;
       }
       
       // Handle API errors
       const pollenError = error as PollenError;
-      setError(pollenError);
+      
+      // Clear fetch ID to allow retries
+      lastFetchIdRef.current = null;
+      
+      setState(prevState => ({
+        ...prevState,
+        error: pollenError,
+        isLoading: false,
+        isRefreshing: false
+      }));
+      onErrorRef.current?.(pollenError);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateState, processPollenData, setError, onDataUpdate]);
+  }, [processPollenData]);
   
   /**
    * Refreshes current data using last fetch parameters
@@ -335,12 +373,19 @@ export function usePollenData(options: {
    * Updates data age periodically
    */
   useEffect(() => {
+    if (!state.lastUpdated) return;
+    
+    const startTime = state.lastUpdated.getTime();
+    
     const updateAge = () => {
-      if (state.lastUpdated) {
-        const ageMs = Date.now() - state.lastUpdated.getTime();
-        const ageMinutes = Math.floor(ageMs / (1000 * 60));
-        updateState({ dataAge: ageMinutes });
-      }
+      const ageMs = Date.now() - startTime;
+      const ageMinutes = Math.floor(ageMs / (1000 * 60));
+      
+      setState(prevState => {
+        // Only update if age actually changed
+        if (prevState.dataAge === ageMinutes) return prevState;
+        return { ...prevState, dataAge: ageMinutes };
+      });
     };
     
     // Update immediately
@@ -350,33 +395,23 @@ export function usePollenData(options: {
     const interval = setInterval(updateAge, 60000);
     
     return () => clearInterval(interval);
-  }, [state.lastUpdated, updateState]);
+  }, [state.lastUpdated]);
   
   /**
    * Auto-refresh data if enabled
+   * DISABLED in MVP to avoid infinite re-render issues
    */
   useEffect(() => {
-    if (!autoRefresh || !state.lastUpdated) return;
-    
-    const scheduleRefresh = () => {
-      const nextRefreshMs = POLLEN_DATA_CONFIG.refreshThreshold * 60 * 1000;
-      
-      refreshTimerRef.current = window.setTimeout(() => {
-        if (lastFetchParamsRef.current) {
-          refreshData();
-        }
-      }, nextRefreshMs);
-    };
-    
-    scheduleRefresh();
-    
+    // TODO: Re-implement auto-refresh without causing infinite loops
+    // The issue is that fetchData changes on every render, causing this effect to re-run
+    // For MVP, manual refresh is sufficient
     return () => {
       if (refreshTimerRef.current) {
         clearTimeout(refreshTimerRef.current);
         refreshTimerRef.current = null;
       }
     };
-  }, [autoRefresh, state.lastUpdated, refreshData]);
+  }, []);
   
   /**
    * Cleanup on unmount

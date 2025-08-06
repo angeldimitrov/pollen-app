@@ -362,12 +362,15 @@ export function useLocation(options: {
   
   /**
    * Auto-detect location on mount if enabled
+   * NOTE: detectLocation not in dependencies to prevent multiple triggers
+   * The condition check is sufficient to prevent multiple runs
    */
   useEffect(() => {
     if (autoDetect && state.settings.useAutoDetection && !state.location && state.isSupported) {
+      console.log('🎯 useLocation: Triggering auto-detection');
       detectLocation();
     }
-  }, [autoDetect, state.settings.useAutoDetection, state.location, state.isSupported, detectLocation]);
+  }, [autoDetect, state.settings.useAutoDetection, state.location, state.isSupported]);
   
   /**
    * Periodically check permission state
