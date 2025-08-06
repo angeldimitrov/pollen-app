@@ -43,14 +43,12 @@ function App(): React.JSX.Element {
   // Stable callbacks to prevent infinite loops
   const onLocationChange = useCallback((location: Location) => {
     console.log('📍 Location changed:', location);
-    // Refresh pollen data when location changes significantly
-    if (pollenHookRef.current?.needsRefresh(location)) {
-      pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
-        tree: 5,
-        grass: 5, 
-        weed: 5
-      });
-    }
+    // Always refresh pollen data when location changes
+    pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
+      tree: 5,
+      grass: 5, 
+      weed: 5
+    });
   }, []);
   
   const onLocationError = useCallback((error: LocationError) => {
