@@ -316,6 +316,9 @@ export function getActivityRecommendation(processedData: ProcessedPollenData): {
 } {
   const { overallRisk, overallScore } = processedData;
   
+  // Use overallScore for more specific recommendations based on numeric score
+  const hasHighScore = overallScore > 6;
+  
   switch (overallRisk) {
     case 'low':
       return {
@@ -334,7 +337,9 @@ export function getActivityRecommendation(processedData: ProcessedPollenData): {
     case 'high':
       return {
         recommendation: 'caution',
-        reason: 'High pollen levels - limit outdoor exposure and take medication.',
+        reason: hasHighScore ? 
+          'Very high pollen levels - strongly consider staying indoors.' :
+          'High pollen levels - limit outdoor exposure and take medication.',
         bestTime: 'Early morning before 10 AM',
       };
       

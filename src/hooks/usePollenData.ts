@@ -11,15 +11,13 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
-  DailyPollenInfo, 
   PollenResponse, 
   PollenError,
   ProcessedPollenData 
 } from '../types/pollen';
 import { Location, SensitivityProfile } from '../types/user';
 import { 
-  fetchPollenForecast, 
-  fetchCurrentPollenData,
+  fetchPollenForecast,
   PollenErrorType 
 } from '../services/pollenApi';
 import { 
@@ -247,7 +245,8 @@ export function usePollenData(options: {
       const pollenError = error as PollenError;
       setError(pollenError);
     }
-  }, [state.current, updateState, processPollenData, setError, onDataUpdate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateState, processPollenData, setError, onDataUpdate]);
   
   /**
    * Refreshes current data using last fetch parameters

@@ -13,6 +13,7 @@ import {
   UserProfile, 
   SensitivityProfile, 
   AppSettings, 
+  Location,
   DEFAULT_SENSITIVITY, 
   DEFAULT_APP_SETTINGS 
 } from '../types/user';
@@ -47,12 +48,12 @@ function generateUserId(): string {
  * @param sensitivity - Sensitivity profile to validate
  * @returns true if valid, false otherwise
  */
-function validateSensitivityProfile(sensitivity: any): sensitivity is SensitivityProfile {
+function validateSensitivityProfile(sensitivity: unknown): sensitivity is SensitivityProfile {
   if (!sensitivity || typeof sensitivity !== 'object') {
     return false;
   }
   
-  const { tree, grass, weed } = sensitivity;
+  const { tree, grass, weed } = sensitivity as Record<string, unknown>;
   
   return (
     typeof tree === 'number' && tree >= 1 && tree <= 10 &&
@@ -67,12 +68,12 @@ function validateSensitivityProfile(sensitivity: any): sensitivity is Sensitivit
  * @param settings - App settings to validate
  * @returns true if valid, false otherwise
  */
-function validateAppSettings(settings: any): settings is AppSettings {
+function validateAppSettings(settings: unknown): settings is AppSettings {
   if (!settings || typeof settings !== 'object') {
     return false;
   }
   
-  const { temperatureUnit, language, enableNotifications, dataRefreshInterval } = settings;
+  const { temperatureUnit, language, enableNotifications, dataRefreshInterval } = settings as Record<string, unknown>;
   
   return (
     (temperatureUnit === 'celsius' || temperatureUnit === 'fahrenheit') &&
@@ -89,10 +90,10 @@ function validateAppSettings(settings: any): settings is AppSettings {
  * @param version - Version of the stored data
  * @returns Migrated data in current format
  */
-function migrateUserProfile(data: any, version?: string): Partial<UserProfile> {
+function migrateUserProfile(data: unknown, version?: string): Partial<UserProfile> {
   // Version 1.0.0 is the initial version, no migration needed
   if (version === STORAGE_CONFIG.currentVersion) {
-    return data;
+    return data as Partial<UserProfile>;
   }
   
   // Handle pre-versioned data (assume version 0.9.x format)
@@ -102,17 +103,23 @@ function migrateUserProfile(data: any, version?: string): Partial<UserProfile> {
     // Extract what we can from old format
     const migrated: Partial<UserProfile> = {};
     
-    if (data.sensitivity && validateSensitivityProfile(data.sensitivity)) {
-      migrated.sensitivity = data.sensitivity;
+    const dataObj = data as Record<string, unknown>;
+    
+    if (dataObj.sensitivity && validateSensitivityProfile(dataObj.sensitivity)) {
+      migrated.sensitivity = dataObj.sensitivity;
     }
     
-    if (data.settings && validateAppSettings(data.settings)) {
-      migrated.settings = data.settings;
+    if (dataObj.settings && validateAppSettings(dataObj.settings)) {
+      migrated.settings = dataObj.settings;
     }
     
     // Location settings are handled by locationService
-    if (data.location) {
-      migrated.location = data.location;
+    if (dataObj.location) {
+      migrated.location = {
+        current: dataObj.location as Location,
+        useAutoDetection: true,
+        savedLocations: [],
+      };
     }
     
     return migrated;
@@ -162,7 +169,7 @@ function isLocalStorageAvailable(): boolean {
  * @param data - Data to estimate
  * @returns Approximate size in bytes
  */
-function estimateStorageSize(data: any): number {
+function estimateStorageSize(data: unknown): number {
   try {
     return JSON.stringify(data).length * 2; // Rough estimate (UTF-16)
   } catch {

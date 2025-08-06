@@ -56,9 +56,9 @@ const SPINNER_COLORS = {
  * Animated spinner SVG component
  * Uses CSS animations for smooth performance
  */
-const SpinnerIcon: React.FC<{ size: string; color: string }> = ({ size, color }) => (
+const SpinnerIcon: React.FC<{ size: string; color: string; className?: string }> = ({ size, color, className = '' }) => (
   <svg
-    className={`${size} ${color} animate-spin`}
+    className={`${size} ${color} animate-spin ${className}`}
     fill="none"
     viewBox="0 0 24 24"
     role="img"
@@ -156,6 +156,7 @@ export function InlineSpinner({
     <SpinnerIcon
       size={sizeConfig.spinner}
       color={colorClass}
+      className={className}
     />
   );
 }

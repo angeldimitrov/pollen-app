@@ -361,6 +361,11 @@ If you encounter issues not covered in this document:
 3. Consult React and Vite documentation
 4. Check GitHub issues for similar problems
 
+## Development Constraints
+
+### Critical Reminder
+- **please do not use mock data!!! no fallbacks!!!**
+
 ---
 
 **Remember**: This is an MVP focused on delivering core value quickly. Avoid scope creep and maintain focus on the essential features: location-based pollen data, personalized risk assessment, and 3-day forecast.

@@ -38,4 +38,17 @@ export default defineConfig({
       }
     })
   ],
+  server: {
+    proxy: {
+      '/api/pollen': {
+        target: 'https://pollen.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/pollen/, '/v1'),
+        secure: true,
+        headers: {
+          'User-Agent': 'Pollen-Tracker-App/1.0'
+        }
+      }
+    }
+  }
 })

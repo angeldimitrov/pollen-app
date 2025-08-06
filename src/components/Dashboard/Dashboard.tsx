@@ -119,7 +119,6 @@ export function Dashboard({
       <LocationCard
         location={location}
         onLocationDetect={onLocationDetect}
-        lastUpdated={pollenData?.lastUpdated}
       />
       
       {/* Main Risk Indicator */}
