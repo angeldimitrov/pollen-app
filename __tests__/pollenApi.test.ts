@@ -16,12 +16,10 @@ import {
 import { Location } from '../src/types/user'
 import { PollenError } from '../src/types/pollen'
 
-// Mock environment variables at the module level
-vi.mock('import.meta.env', () => ({
-  DEV: false,
-  VITE_GOOGLE_API_KEY: 'test-api-key',
-  VITE_POLLEN_API_BASE: 'https://pollen.googleapis.com/v1'
-}))
+// Mock environment variables using vi.stubEnv for proper Vite environment mocking
+vi.stubEnv('VITE_GOOGLE_API_KEY', 'test-api-key-for-testing')
+vi.stubEnv('VITE_POLLEN_API_BASE', 'https://pollen.googleapis.com/v1')
+vi.stubEnv('DEV', 'false')
 
 // Mock global fetch
 const mockFetch = vi.fn()

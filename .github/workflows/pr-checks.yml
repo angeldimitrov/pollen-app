@@ -34,6 +34,8 @@ jobs:
       
       - name: Run unit tests
         run: npm run test:run
+        env:
+          VITE_GOOGLE_API_KEY: test-api-key-for-ci
       
       - name: Build project
         run: npm run build
