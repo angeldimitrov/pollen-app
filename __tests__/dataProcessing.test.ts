@@ -6,7 +6,7 @@
  * These tests ensure data flows correctly between API responses and UI components.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { calculatePersonalizedRisk } from '../src/utils/calculateRisk'
 import { DailyPollenInfo, PollenTypeInfo } from '../src/types/pollen'
 import { SensitivityProfile } from '../src/types/user'
@@ -388,11 +388,7 @@ describe('Data Processing - Pollen Data Transformation', () => {
       // (1×1 + 1×1 + 1×1) / 3 / 10 = 0.1
       expect(lowResult.overallRisk).toBe('low')
 
-      // Test moderate risk (2-5)
-      const moderateRiskData = createMockDailyPollenData(new Date(), 3, 3, 3) // All indices = 3
-      const moderateSensitivity = { tree: 5, grass: 5, weed: 5 } // All sensitivity = 5
-      const moderateResult = calculatePersonalizedRisk(moderateRiskData, moderateSensitivity)
-      // (3×5 + 3×5 + 3×5) / 3 / 10 = 1.5 - still low, let's increase
+      // Test moderate risk (2-5) - using higher values to reach moderate threshold
       
       const moderateRiskData2 = createMockDailyPollenData(new Date(), 4, 4, 4) // All indices = 4
       const moderateSensitivity2 = { tree: 6, grass: 6, weed: 6 } // All sensitivity = 6

@@ -6,7 +6,7 @@
  * the app can obtain accurate coordinates for pollen data requests.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useLocation } from '../src/hooks/useLocation'
 import { Location, LocationError, LocationErrorType } from '../src/types/user'

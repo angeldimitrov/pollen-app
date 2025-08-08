@@ -227,7 +227,7 @@ describe('Risk Calculation - Core Business Logic', () => {
       expect(result.pollenTypes.weed.score).toBe(5.0) // (5 × 10) / 10 = 5.0
 
       // Overall should be high risk (exactly at boundary)
-      const expectedOverall = (5.0 + 5.0 + 5.0) / 3 // = 5.0
+      // Expected: (5.0 + 5.0 + 5.0) / 3 = 5.0
       expect(result.overallScore).toBe(5.0)
       expect(result.overallRisk).toBe('high') // 5.0 is exactly at high risk boundary
     })
@@ -292,7 +292,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'low',
         overallScore: 1.5,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }
@@ -314,7 +318,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'high',
         overallScore: 4.0,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }
@@ -337,7 +345,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'moderate',
         overallScore: 2.5,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }
@@ -361,7 +373,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'low',
         overallScore: 1.0,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }
@@ -379,7 +395,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'moderate',
         overallScore: 3.0,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }
@@ -397,7 +417,11 @@ describe('Risk Calculation - Core Business Logic', () => {
         location: 'Test',
         overallRisk: 'very-high',
         overallScore: 9.0,
-        pollenTypes: {} as any,
+        pollenTypes: {
+          tree: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          grass: { score: 0, risk: 'low' as const, rawIndex: 0 },
+          weed: { score: 0, risk: 'low' as const, rawIndex: 0 }
+        },
         recommendations: [],
         lastUpdated: mockDate
       }

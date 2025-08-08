@@ -71,7 +71,7 @@ beforeEach(() => {
   mockGeolocation.clearWatch.mockClear()
   
   // Reset fetch mock
-  if (typeof global.fetch === 'function') {
-    (global.fetch as any).mockClear()
+  if (typeof global.fetch === 'function' && 'mockClear' in global.fetch) {
+    (global.fetch as { mockClear: () => void }).mockClear()
   }
 })
