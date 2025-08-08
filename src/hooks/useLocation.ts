@@ -193,6 +193,7 @@ export function useLocation(options: {
       const location = await detectCurrentLocation({
         timeout: 15000,
         highAccuracy: true,
+        includeAddress: true, // Enable reverse geocoding to populate city information
       });
       
       // Check if this is a significant location change
