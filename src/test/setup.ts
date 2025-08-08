@@ -73,6 +73,6 @@ beforeEach(() => {
   
   // Reset fetch mock
   if (typeof global.fetch === 'function' && 'mockClear' in global.fetch) {
-    (global.fetch as { mockClear: () => void }).mockClear()
+    (global.fetch as unknown as { mockClear: () => void }).mockClear()
   }
 })
