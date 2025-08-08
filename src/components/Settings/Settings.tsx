@@ -24,7 +24,6 @@ export function Settings({
       const success = await onSave();
       if (success) {
         // Could show a success message here
-        console.log('Settings saved successfully');
       }
     }
   };

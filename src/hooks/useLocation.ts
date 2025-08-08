@@ -168,8 +168,8 @@ export function useLocation(options: {
     try {
       const permission = await getLocationPermission();
       updateState({ permission });
-    } catch (error) {
-      console.warn('Failed to check location permission:', error);
+    } catch {
+      // Ignore permission check errors
     }
   }, [updateState]);
   
@@ -414,7 +414,6 @@ export function useLocation(options: {
    */
   useEffect(() => {
     if (autoDetect && state.settings.useAutoDetection && !state.location && state.isSupported) {
-      console.log('🎯 useLocation: Triggering auto-detection');
       detectLocation();
     }
   }, [autoDetect, state.settings.useAutoDetection, state.location, state.isSupported, detectLocation]);

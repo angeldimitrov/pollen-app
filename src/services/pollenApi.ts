@@ -226,15 +226,6 @@ export async function fetchPollenForecast(
     
     const url = buildPollenUrl(request);
     
-    console.log('🔗 ACTUAL URL BEING CALLED:', url);
-    console.log('📡 Request Details:', {
-      method: 'GET',
-      location: `${request.location.latitude}, ${request.location.longitude}`,
-      days: request.days,
-      includeDetails: request.plantsDescription,
-      language: request.languageCode
-    });
-    
     // Implement request with timeout and retry logic
     const response = await withRetry(async () => {
       const controller = new AbortController();
@@ -270,17 +261,6 @@ export async function fetchPollenForecast(
     });
     
     const data = await response.json();
-    
-    console.log('🎯 RAW GOOGLE API RESPONSE STATUS:', response.status, response.statusText);
-    console.log('📥 RAW GOOGLE API RESPONSE BODY:', JSON.stringify(data, null, 2));
-    console.log('🔍 Response Analysis:', {
-      hasRegionCode: !!data.regionCode,
-      regionCode: data.regionCode,
-      hasDailyInfo: !!data.dailyInfo,
-      dailyInfoLength: data.dailyInfo?.length,
-      firstDayDate: data.dailyInfo?.[0]?.date,
-      responseSize: JSON.stringify(data).length + ' characters'
-    });
     
     // Transform and validate response
     if (!data.dailyInfo || !Array.isArray(data.dailyInfo)) {

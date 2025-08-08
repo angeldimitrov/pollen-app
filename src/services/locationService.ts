@@ -197,7 +197,7 @@ export async function detectCurrentLocation(
         // Check accuracy if high accuracy was requested
         if (geolocationOptions.enableHighAccuracy && 
             accuracy > LOCATION_CONFIG.minimumAccuracy) {
-          console.warn(`Location accuracy (${accuracy}m) exceeds minimum requirement (${LOCATION_CONFIG.minimumAccuracy}m)`);
+          // Accuracy warning was removed for production
         }
         
         // Create base location with coordinates
@@ -227,9 +227,8 @@ export async function detectCurrentLocation(
               
               resolve(enhancedLocation);
             })
-            .catch((reverseGeocodeError) => {
-              // If reverse geocoding fails, log warning but continue with basic location
-              console.warn('Reverse geocoding failed, using basic location:', reverseGeocodeError);
+            .catch(() => {
+              // If reverse geocoding fails, continue with basic location
               resolve(baseLocation);
             });
         } else {
@@ -350,8 +349,7 @@ export function saveLocationSettings(settings: LocationSettings): void {
     });
     
     localStorage.setItem(LOCATION_STORAGE_KEY, serialized);
-  } catch (error) {
-    console.warn('Failed to save location settings:', error);
+  } catch {
     // Non-critical error - app continues without persistence
   }
 }
@@ -380,8 +378,7 @@ export function loadLocationSettings(): LocationSettings {
       savedLocations: Array.isArray(parsed.savedLocations) ? parsed.savedLocations : [],
       lastDetectionTime: parsed.lastDetectionTime ? new Date(parsed.lastDetectionTime) : undefined,
     };
-  } catch (error) {
-    console.warn('Failed to load location settings, using defaults:', error);
+  } catch {
     return {
       useAutoDetection: true,
       savedLocations: [],

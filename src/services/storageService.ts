@@ -98,7 +98,6 @@ function migrateUserProfile(data: unknown, version?: string): Partial<UserProfil
   
   // Handle pre-versioned data (assume version 0.9.x format)
   if (!version) {
-    console.info('Migrating user profile from pre-versioned format');
     
     // Extract what we can from old format
     const migrated: Partial<UserProfile> = {};
@@ -125,7 +124,6 @@ function migrateUserProfile(data: unknown, version?: string): Partial<UserProfil
     return migrated;
   }
   
-  console.warn(`Unknown data version: ${version}, using defaults`);
   return {};
 }
 
@@ -185,14 +183,12 @@ function estimateStorageSize(data: unknown): number {
  */
 export function loadUserProfile(): UserProfile {
   if (!isLocalStorageAvailable()) {
-    console.warn('localStorage not available, using defaults');
     return createDefaultProfile();
   }
   
   try {
     const stored = localStorage.getItem(STORAGE_CONFIG.keys.userProfile);
     if (!stored) {
-      console.info('No stored user profile found, creating default');
       return createDefaultProfile();
     }
     
@@ -227,8 +223,7 @@ export function loadUserProfile(): UserProfile {
     
     return profile;
     
-  } catch (error) {
-    console.error('Failed to load user profile, using defaults:', error);
+  } catch {
     return createDefaultProfile();
   }
 }
@@ -242,7 +237,6 @@ export function loadUserProfile(): UserProfile {
  */
 export function saveUserProfile(profile: UserProfile): boolean {
   if (!isLocalStorageAvailable()) {
-    console.warn('localStorage not available, cannot save profile');
     return false;
   }
   
@@ -259,7 +253,6 @@ export function saveUserProfile(profile: UserProfile): boolean {
     // Check storage size to avoid quota errors
     const estimatedSize = estimateStorageSize(profileToSave);
     if (estimatedSize > STORAGE_CONFIG.maxStorageSize) {
-      console.error('Profile data too large for localStorage');
       return false;
     }
     
@@ -268,11 +261,9 @@ export function saveUserProfile(profile: UserProfile): boolean {
     return true;
     
   } catch (error) {
-    console.error('Failed to save user profile:', error);
-    
     // Handle quota exceeded error
     if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-      console.error('localStorage quota exceeded');
+      // Could implement quota management here
     }
     
     return false;
@@ -288,7 +279,6 @@ export function saveUserProfile(profile: UserProfile): boolean {
  */
 export function updateSensitivityProfile(sensitivity: SensitivityProfile): boolean {
   if (!validateSensitivityProfile(sensitivity)) {
-    console.error('Invalid sensitivity profile provided');
     return false;
   }
   
@@ -307,7 +297,6 @@ export function updateSensitivityProfile(sensitivity: SensitivityProfile): boole
  */
 export function updateAppSettings(settings: AppSettings): boolean {
   if (!validateAppSettings(settings)) {
-    console.error('Invalid app settings provided');
     return false;
   }
   
@@ -353,10 +342,9 @@ export function clearAllUserData(): void {
     // Remove any location settings (handled by locationService)
     localStorage.removeItem('pollenTracker.locationSettings');
     
-    console.info('All user data cleared from localStorage');
     
-  } catch (error) {
-    console.error('Failed to clear user data:', error);
+  } catch {
+    // Ignore clear data errors
   }
 }
 

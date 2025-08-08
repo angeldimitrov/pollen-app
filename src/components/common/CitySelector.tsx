@@ -42,8 +42,8 @@ export const CitySelector: React.FC<CitySelectorProps> = ({
       try {
         const cities = await getPopularCities();
         setPopularCities(cities);
-      } catch (error) {
-        console.warn('Failed to load popular cities:', error);
+      } catch {
+        // Ignore errors loading popular cities
       }
     };
 

@@ -342,8 +342,7 @@ export function useSensitivity(options: {
         isValid: true,
       });
       
-    } catch (error) {
-      console.error('Failed to load sensitivity profile:', error);
+    } catch {
       setError('Failed to load your sensitivity settings. Using defaults.');
       
       setOriginalSensitivity({ ...DEFAULT_SENSITIVITY });

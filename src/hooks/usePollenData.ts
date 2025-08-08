@@ -183,7 +183,6 @@ export function usePollenData(options: {
     
     // Prevent duplicate requests with same parameters
     if (lastFetchIdRef.current === fetchId) {
-      console.log('⚠️  Skipping duplicate fetch request');
       return;
     }
     
@@ -210,12 +209,6 @@ export function usePollenData(options: {
       lastFetchParamsRef.current = { location, sensitivity, days };
       
       // Fetch pollen forecast data
-      console.log('🌐 Making API request to Google Pollen API:', {
-        url: `https://pollen.googleapis.com/v1/forecast:lookup`,
-        location: `${location.latitude}, ${location.longitude}`,
-        days,
-        timestamp: new Date().toISOString()
-      });
       
       const pollenResponse = await fetchPollenForecast(
         location,
@@ -227,16 +220,6 @@ export function usePollenData(options: {
         }
       );
       
-      console.log('✅ RAW API RESPONSE FROM GOOGLE POLLEN API:', JSON.stringify(pollenResponse, null, 2));
-      console.log('📊 API Response Summary:', {
-        regionCode: pollenResponse.regionCode,
-        daysReceived: pollenResponse.dailyInfo?.length,
-        firstDayDate: pollenResponse.dailyInfo?.[0]?.date,
-        hasTreePollen: !!pollenResponse.dailyInfo?.[0]?.pollenTypeInfo?.find(p => p.code === 'TREE'),
-        hasGrassPollen: !!pollenResponse.dailyInfo?.[0]?.pollenTypeInfo?.find(p => p.code === 'GRASS'),
-        hasWeedPollen: !!pollenResponse.dailyInfo?.[0]?.pollenTypeInfo?.find(p => p.code === 'WEED'),
-        totalPlantTypes: pollenResponse.dailyInfo?.[0]?.plantInfo?.length || 0
-      });
       
       // Process data with personalization
       const processedData = processPollenData(pollenResponse, sensitivity, location);
@@ -297,7 +280,6 @@ export function usePollenData(options: {
   const refreshData = useCallback(async () => {
     const lastParams = lastFetchParamsRef.current;
     if (!lastParams) {
-      console.warn('No previous fetch parameters available for refresh');
       return;
     }
     

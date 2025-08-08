@@ -60,12 +60,10 @@ const RISK_CONFIG = {
 function calculatePollenRiskScore(pollenIndex: number, userSensitivity: number): number {
   // Validate inputs
   if (pollenIndex < 0 || pollenIndex > 5) {
-    console.warn(`Invalid pollen index: ${pollenIndex}, clamping to 0-5 range`);
     pollenIndex = Math.max(0, Math.min(5, pollenIndex));
   }
   
   if (userSensitivity < 1 || userSensitivity > 10) {
-    console.warn(`Invalid user sensitivity: ${userSensitivity}, clamping to 1-10 range`);
     userSensitivity = Math.max(1, Math.min(10, userSensitivity));
   }
   

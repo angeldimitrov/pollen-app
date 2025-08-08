@@ -157,7 +157,6 @@ export async function searchCities(query: string, limit: number = 5): Promise<Ci
       throw error;
     }
 
-    console.error('City search error:', error);
     throw new MapsServiceError('Unable to search for cities. Please check your internet connection.');
   }
 }
@@ -241,7 +240,6 @@ export async function getCityCoordinates(cityName: string): Promise<City> {
       throw error;
     }
 
-    console.error('Geocoding error:', error);
     throw new MapsServiceError('Unable to get city coordinates. Please check your internet connection.');
   }
 }
@@ -289,8 +287,7 @@ export async function getPopularCities(countryCode: string = 'US'): Promise<City
       cities.map(async (cityName) => {
         try {
           return await getCityCoordinates(cityName);
-        } catch (error) {
-          console.warn(`Failed to get coordinates for ${cityName}:`, error);
+        } catch {
           return null;
         }
       })
@@ -298,8 +295,7 @@ export async function getPopularCities(countryCode: string = 'US'): Promise<City
 
     // Filter out failed lookups
     return citiesWithCoordinates.filter((city): city is City => city !== null);
-  } catch (error) {
-    console.error('Failed to load popular cities:', error);
+  } catch {
     return [];
   }
 }
@@ -410,7 +406,6 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       throw error;
     }
 
-    console.error('Reverse geocoding error:', error);
     // Return fallback information instead of throwing
     // This ensures graceful degradation when reverse geocoding fails
     return {

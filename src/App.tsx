@@ -16,7 +16,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { useLocation } from './hooks/useLocation';
 import { usePollenData } from './hooks/usePollenData';
 import { useSensitivity } from './hooks/useSensitivity';
-import { Location, LocationError, SensitivityProfile } from './types/user';
+import { Location, SensitivityProfile } from './types/user';
 import { PollenError } from './types/pollen';
 import { City } from './services/mapsService';
 
@@ -42,7 +42,6 @@ function App(): React.JSX.Element {
   
   // Stable callbacks to prevent infinite loops
   const onLocationChange = useCallback((location: Location) => {
-    console.log('📍 Location changed:', location);
     // Always refresh pollen data when location changes
     pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
       tree: 5,
@@ -51,13 +50,11 @@ function App(): React.JSX.Element {
     });
   }, []);
   
-  const onLocationError = useCallback((error: LocationError) => {
-    console.error('Location error:', error);
+  const onLocationError = useCallback(() => {
     // Don't show location errors as app-level errors - let components handle them
   }, []);
   
   const onSensitivityChange = useCallback((newSensitivity: SensitivityProfile) => {
-    console.log('⚙️ Sensitivity changed:', newSensitivity);
     // Recalculate pollen data when sensitivity changes
     const location = pollenHookRef.current?.location;
     if (location) {
@@ -66,7 +63,6 @@ function App(): React.JSX.Element {
   }, []);
   
   const onPollenError = useCallback((error: PollenError) => {
-    console.error('Pollen data error:', error);
     // Show pollen errors as app-level errors since they're critical
     setAppError(error.message);
   }, []);
@@ -79,8 +75,6 @@ function App(): React.JSX.Element {
   });
 
   const onCitySelect = useCallback(async (city: City) => {
-    console.log('🏙️ City selected:', city);
-    
     try {
       // Clear any existing errors
       setAppError(null);
@@ -91,8 +85,7 @@ function App(): React.JSX.Element {
       // The location hook will trigger a pollen data fetch automatically
       // via the onLocationChange callback
       
-    } catch (error) {
-      console.error('Failed to set city location:', error);
+    } catch {
       setAppError('Failed to update location. Please try again.');
     }
   }, [locationHook]);
@@ -115,21 +108,12 @@ function App(): React.JSX.Element {
    * CRITICAL: Only runs if no data fetch is already in progress/completed
    */
   useEffect(() => {
-    console.log('🎯 App.tsx useEffect triggered:', {
-      hasLocation: !!locationHook.location,
-      sensitivityLoading: sensitivity.isLoading,
-      hasPollenData: !!pollenHook.current,
-      isLoadingOrRefreshing: pollenHook.isLoading || pollenHook.isRefreshing,
-      location: locationHook.location ? `${locationHook.location.latitude}, ${locationHook.location.longitude}` : 'none'
-    });
-    
     // Only fetch if we have location, sensitivity is loaded, no data exists, and no fetch is in progress
     if (locationHook.location && 
         !sensitivity.isLoading && 
         !pollenHook.current && 
         !pollenHook.isLoading && 
         !pollenHook.isRefreshing) {
-      console.log('🚀 Triggering initial data fetch from App.tsx');
       pollenHook.fetchData(locationHook.location, sensitivity.sensitivity);
     }
   }, [locationHook.location, sensitivity.isLoading, sensitivity.sensitivity, pollenHook]);
@@ -219,8 +203,7 @@ function App(): React.JSX.Element {
   
   return (
     <ErrorBoundary
-      onError={(error) => {
-        console.error('App-level error:', error);
+      onError={() => {
         setAppError('An unexpected error occurred. Please refresh the app.');
       }}
     >
