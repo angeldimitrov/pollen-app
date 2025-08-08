@@ -149,7 +149,7 @@ export function Navigation({ currentView, onViewChange }: NavigationProps): Reac
   
   return (
     <nav
-      className="bg-white border-t border-gray-200 safe-bottom"
+      className="bg-white/95 backdrop-blur-md border-t border-gray-100 safe-bottom shadow-lg"
       role="tablist"
       aria-label="Main navigation"
     >
@@ -169,11 +169,14 @@ export function Navigation({ currentView, onViewChange }: NavigationProps): Reac
               className={`
                 flex flex-col items-center justify-center
                 min-h-touch min-w-touch
-                px-2 py-2
-                transition-colors duration-200
+                px-3 py-2 mx-1 rounded-2xl
+                transition-all duration-200 ease-out
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset
                 no-select
-                ${isActive ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}
+                ${isActive 
+                  ? 'text-blue-600 bg-blue-50 shadow-sm scale-105' 
+                  : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 hover:scale-105 active:scale-95'
+                }
               `}
               onClick={() => handleTabPress(tab.id)}
               onKeyPress={(e) => handleKeyPress(e, tab.id)}
@@ -186,20 +189,12 @@ export function Navigation({ currentView, onViewChange }: NavigationProps): Reac
               {/* Label */}
               <span
                 className={`
-                  text-xs font-medium
+                  text-xs font-semibold tracking-tight
                   ${isActive ? 'text-blue-600' : 'text-gray-500'}
                 `}
               >
                 {tab.label}
               </span>
-              
-              {/* Active indicator */}
-              {isActive && (
-                <div
-                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"
-                  aria-hidden="true"
-                />
-              )}
             </button>
           );
         })}

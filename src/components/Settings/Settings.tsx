@@ -35,62 +35,92 @@ export function Settings({
 
   return (
     <div className="p-4 max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold mb-6">Settings</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-8">Settings</h2>
       
       {/* Sensitivity Settings */}
-      <div className="bg-white rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-medium mb-4">Pollen Sensitivity Levels</h3>
-        <div className="space-y-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 ring-1 ring-black/5 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Pollen Sensitivity Levels</h3>
+        <div className="space-y-6">
           <div>
-            <label htmlFor="tree-sensitivity" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="tree-sensitivity" className="block text-sm font-semibold text-gray-700 mb-3">
               Tree Pollen: {sensitivity.sensitivity.tree}/10
             </label>
-            <input
-              id="tree-sensitivity"
-              type="range"
-              min="1"
-              max="10"
-              value={sensitivity.sensitivity.tree}
-              onChange={(e) => sensitivity.setTreeSensitivity(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
+            <div className="slider-container relative">
+              <input
+                id="tree-sensitivity"
+                type="range"
+                min="1"
+                max="10"
+                value={sensitivity.sensitivity.tree}
+                onChange={(e) => sensitivity.setTreeSensitivity(parseInt(e.target.value))}
+                className="slider-premium"
+                aria-label="Tree pollen sensitivity level"
+                style={{
+                  background: `linear-gradient(to right, 
+                    rgb(34, 197, 94) 0%, 
+                    rgb(22, 163, 74) ${(sensitivity.sensitivity.tree / 10) * 100}%, 
+                    #f3f4f6 ${(sensitivity.sensitivity.tree / 10) * 100}%, 
+                    #e5e7eb 100%)`
+                }}
+              />
+            </div>
           </div>
           
           <div>
-            <label htmlFor="grass-sensitivity" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="grass-sensitivity" className="block text-sm font-semibold text-gray-700 mb-3">
               Grass Pollen: {sensitivity.sensitivity.grass}/10
             </label>
-            <input
-              id="grass-sensitivity"
-              type="range"
-              min="1"
-              max="10"
-              value={sensitivity.sensitivity.grass}
-              onChange={(e) => sensitivity.setGrassSensitivity(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
+            <div className="slider-container relative">
+              <input
+                id="grass-sensitivity"
+                type="range"
+                min="1"
+                max="10"
+                value={sensitivity.sensitivity.grass}
+                onChange={(e) => sensitivity.setGrassSensitivity(parseInt(e.target.value))}
+                className="slider-premium"
+                aria-label="Grass pollen sensitivity level"
+                style={{
+                  background: `linear-gradient(to right, 
+                    rgb(234, 179, 8) 0%, 
+                    rgb(245, 158, 11) ${(sensitivity.sensitivity.grass / 10) * 100}%, 
+                    #f3f4f6 ${(sensitivity.sensitivity.grass / 10) * 100}%, 
+                    #e5e7eb 100%)`
+                }}
+              />
+            </div>
           </div>
           
           <div>
-            <label htmlFor="weed-sensitivity" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="weed-sensitivity" className="block text-sm font-semibold text-gray-700 mb-3">
               Weed Pollen: {sensitivity.sensitivity.weed}/10
             </label>
-            <input
-              id="weed-sensitivity"
-              type="range"
-              min="1"
-              max="10"
-              value={sensitivity.sensitivity.weed}
-              onChange={(e) => sensitivity.setWeedSensitivity(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
+            <div className="slider-container relative">
+              <input
+                id="weed-sensitivity"
+                type="range"
+                min="1"
+                max="10"
+                value={sensitivity.sensitivity.weed}
+                onChange={(e) => sensitivity.setWeedSensitivity(parseInt(e.target.value))}
+                className="slider-premium"
+                aria-label="Weed pollen sensitivity level"
+                style={{
+                  background: `linear-gradient(to right, 
+                    rgb(249, 115, 22) 0%, 
+                    rgb(239, 68, 68) ${(sensitivity.sensitivity.weed / 10) * 100}%, 
+                    #f3f4f6 ${(sensitivity.sensitivity.weed / 10) * 100}%, 
+                    #e5e7eb 100%)`
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
       
       {/* Location Settings */}
-      <div className="bg-white rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-medium mb-4">Location</h3>
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 ring-1 ring-black/5 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
         {locationHook.location ? (
           <div className="space-y-2">
             <p className="text-sm text-gray-600">
@@ -102,7 +132,7 @@ export function Settings({
             <button
               onClick={handleDetectLocation}
               disabled={locationHook.isLoading}
-              className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-4 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {locationHook.isLoading ? 'Detecting...' : 'Update Location'}
             </button>
@@ -113,7 +143,7 @@ export function Settings({
             <button
               onClick={handleDetectLocation}
               disabled={locationHook.isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {locationHook.isLoading ? 'Detecting...' : 'Detect Location'}
             </button>
@@ -123,11 +153,11 @@ export function Settings({
       
       {/* Save Settings */}
       {sensitivity.hasChanges && (
-        <div className="bg-white rounded-lg p-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 ring-1 ring-black/5">
           <button
             onClick={handleSave}
             disabled={sensitivity.isSaving}
-            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full btn-primary"
           >
             {sensitivity.isSaving ? 'Saving...' : 'Save Settings'}
           </button>

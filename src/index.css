@@ -86,20 +86,98 @@
 
   /* Mobile-optimized card component */
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4;
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 ring-1 ring-black/5;
   }
 
   /* Touch-friendly button base */
   .btn-base {
-    @apply inline-flex items-center justify-center min-h-touch px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center min-h-touch px-6 py-3 text-sm font-semibold rounded-xl border transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm;
   }
 
   .btn-primary {
-    @apply btn-base bg-blue-600 hover:bg-blue-700 text-white border-transparent focus:ring-blue-500;
+    @apply btn-base bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-transparent focus:ring-blue-500 hover:shadow-md hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply btn-base bg-gray-100 hover:bg-gray-200 text-gray-900 border-gray-300 focus:ring-gray-500;
+    @apply btn-base bg-white hover:bg-gray-50 text-gray-700 border-gray-200 focus:ring-gray-500 hover:shadow-md hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  /* Premium Range Slider Styling */
+  .slider-premium {
+    @apply w-full h-3 rounded-full appearance-none cursor-pointer transition-all duration-200 ease-out;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(209, 213, 219, 0.5);
+  }
+
+  /* Webkit browsers (Chrome, Safari) */
+  .slider-premium::-webkit-slider-thumb {
+    @apply appearance-none w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-lg;
+    @apply ring-4 ring-white ring-offset-1 ring-offset-blue-100/50;
+    @apply transition-all duration-200 ease-out cursor-pointer;
+  }
+
+  .slider-premium:hover::-webkit-slider-thumb {
+    @apply scale-110 shadow-xl;
+    @apply from-blue-600 to-blue-700;
+    @apply ring-offset-blue-200/70;
+  }
+
+  .slider-premium:active::-webkit-slider-thumb {
+    @apply scale-95;
+  }
+
+  .slider-premium:focus::-webkit-slider-thumb {
+    @apply ring-offset-blue-300/80 outline-none;
+  }
+
+  /* Firefox */
+  .slider-premium::-moz-range-thumb {
+    @apply w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-0 shadow-lg cursor-pointer;
+    box-shadow: 0 0 0 4px white, 0 0 0 6px rgba(59, 130, 246, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-out;
+  }
+
+  .slider-premium:hover::-moz-range-thumb {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px white, 0 0 0 6px rgba(59, 130, 246, 0.25), 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216));
+  }
+
+  .slider-premium:active::-moz-range-thumb {
+    transform: scale(0.95);
+  }
+
+  .slider-premium::-moz-range-track {
+    @apply h-3 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full border-0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Focus styles for accessibility */
+  .slider-premium:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+
+  /* Mobile touch enhancements */
+  @media (max-width: 640px) {
+    .slider-premium::-webkit-slider-thumb {
+      @apply w-7 h-7; /* Larger thumb for better touch targets */
+    }
+    
+    .slider-premium::-moz-range-thumb {
+      @apply w-7 h-7;
+    }
+    
+    .slider-premium {
+      @apply h-4; /* Thicker track for mobile */
+    }
+    
+    .slider-premium::-moz-range-track {
+      @apply h-4;
+    }
+  }
+
+  /* Premium track fill effect */
+  .slider-container {
+    @apply relative;
   }
 }
 

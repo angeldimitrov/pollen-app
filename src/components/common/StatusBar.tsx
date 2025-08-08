@@ -48,9 +48,9 @@ const RefreshIcon: React.FC<{ isSpinning?: boolean }> = ({ isSpinning = false })
  */
 const AppIcon: React.FC = () => (
   <div className="flex items-center">
-    <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
+    <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-black/5">
       <svg
-        className="w-4 h-4 text-white"
+        className="w-5 h-5 text-white drop-shadow-sm"
         fill="currentColor"
         viewBox="0 0 24 24"
         aria-hidden="true"
@@ -97,14 +97,14 @@ export function StatusBar({
   };
   
   return (
-    <header className="bg-white px-4 py-3 safe-top">
+    <header className="bg-white/95 backdrop-blur-md px-4 py-3 safe-top border-b border-gray-100 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Left side - App branding */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
           <AppIcon />
           {showTitle && (
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">
+            <div className="min-w-0 flex-shrink-0">
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 tracking-tight whitespace-nowrap">
                 Pollen Tracker
               </h1>
             </div>
@@ -112,10 +112,10 @@ export function StatusBar({
         </div>
         
         {/* Right side - Status and refresh */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2 ml-2 flex-shrink-0">
           {/* Status text */}
           <div className="text-right">
-            <p className="text-sm text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">
               {getStatusText()}
             </p>
           </div>
@@ -129,14 +129,14 @@ export function StatusBar({
               className={`
                 inline-flex items-center justify-center
                 min-h-touch min-w-touch
-                p-2 rounded-lg
-                transition-colors duration-200
+                p-2 rounded-xl
+                transition-all duration-200 ease-out
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                 no-select
                 ${
                   isRefreshing
                     ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:scale-105 active:scale-95'
                 }
               `}
               aria-label={isRefreshing ? 'Updating pollen data' : 'Refresh pollen data'}
