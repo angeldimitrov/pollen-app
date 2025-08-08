@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -67,6 +68,24 @@ export default defineConfig({
           'User-Agent': 'Pollen-Tracker-App/1.0'
         }
       }
+    }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        'vite.config.ts',
+        'eslint.config.js',
+        'tailwind.config.js',
+        'postcss.config.js'
+      ]
     }
   }
 })
