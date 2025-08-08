@@ -157,6 +157,10 @@ export async function getLocationPermission(): Promise<LocationPermission> {
  * Optimized for mobile devices with accuracy filtering
  * 
  * @param options - Optional configuration overrides
+ * @param options.timeout - Geolocation timeout in milliseconds
+ * @param options.highAccuracy - Use high accuracy GPS when available
+ * @param options.maxAge - Maximum age of cached position
+ * @param options.includeAddress - Whether to perform reverse geocoding for city information
  * @returns Promise resolving to detected location
  * @throws {LocationError} If location detection fails
  */
@@ -165,6 +169,7 @@ export async function detectCurrentLocation(
     timeout?: number;
     highAccuracy?: boolean;
     maxAge?: number;
+    includeAddress?: boolean;
   } = {}
 ): Promise<Location> {
   if (!isGeolocationSupported()) {
@@ -195,13 +200,41 @@ export async function detectCurrentLocation(
           console.warn(`Location accuracy (${accuracy}m) exceeds minimum requirement (${LOCATION_CONFIG.minimumAccuracy}m)`);
         }
         
-        const location: Location = {
+        // Create base location with coordinates
+        const baseLocation: Location = {
           latitude,
           longitude,
-          // Additional metadata can be added by reverse geocoding service (future)
+          source: 'auto',
+          timestamp: new Date(),
+          accuracy: accuracy,
         };
         
-        resolve(location);
+        // Perform reverse geocoding if requested
+        if (options.includeAddress) {
+          // Import reverseGeocode dynamically to avoid circular dependencies
+          import('../services/mapsService')
+            .then(({ reverseGeocode }) => reverseGeocode(latitude, longitude))
+            .then((cityInfo) => {
+              // Enhance location with city information
+              const enhancedLocation: Location = {
+                ...baseLocation,
+                city: cityInfo.name,
+                formattedAddress: cityInfo.formattedAddress,
+                displayName: cityInfo.name || cityInfo.formattedAddress,
+                state: cityInfo.region,
+                country: cityInfo.country,
+              };
+              
+              resolve(enhancedLocation);
+            })
+            .catch((reverseGeocodeError) => {
+              // If reverse geocoding fails, log warning but continue with basic location
+              console.warn('Reverse geocoding failed, using basic location:', reverseGeocodeError);
+              resolve(baseLocation);
+            });
+        } else {
+          resolve(baseLocation);
+        }
       },
       (error) => {
         reject(createLocationError(error, 'during geolocation request'));

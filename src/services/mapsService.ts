@@ -304,4 +304,121 @@ export async function getPopularCities(countryCode: string = 'US'): Promise<City
   }
 }
 
+/**
+ * Perform reverse geocoding to get city information from coordinates
+ * 
+ * Converts latitude/longitude coordinates to human-readable address
+ * information, specifically extracting city name and formatted address.
+ * 
+ * @param latitude - Latitude coordinate
+ * @param longitude - Longitude coordinate
+ * @returns Promise<Partial<City>> - City information extracted from coordinates
+ */
+export async function reverseGeocode(latitude: number, longitude: number): Promise<Partial<City>> {
+  if (!API_KEY) {
+    throw new MapsServiceError('Google Maps API key not configured');
+  }
+
+  try {
+    // Use Geocoding API via Vite proxy for reverse geocoding
+    const url = new URL('/api/maps/geocode/json', window.location.origin);
+    url.searchParams.set('latlng', `${latitude},${longitude}`);
+    url.searchParams.set('result_type', 'locality|administrative_area_level_1|administrative_area_level_2');
+    url.searchParams.set('key', API_KEY);
+
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      throw new MapsServiceError(`Reverse Geocoding API HTTP Error: ${response.status}`);
+    }
+
+    const data: GeocodingResponse = await response.json();
+
+    if (data.status === 'REQUEST_DENIED') {
+      throw new MapsServiceError('Reverse Geocoding API access denied. Check API key and enabled services.');
+    }
+
+    if (data.status === 'OVER_QUERY_LIMIT') {
+      throw new MapsServiceError('Geocoding API quota exceeded. Please try again later.');
+    }
+
+    if (data.status === 'ZERO_RESULTS') {
+      // No results found - return partial city info with coordinates
+      return {
+        coordinates: { lat: latitude, lng: longitude },
+        name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+        formattedAddress: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+      };
+    }
+
+    if (data.status !== 'OK') {
+      throw new MapsServiceError(data.error_message || `Reverse geocoding error: ${data.status}`);
+    }
+
+    // Find the best result - prioritize locality, then administrative areas
+    const result = data.results.find(r => 
+      r.address_components.some(c => c.types.includes('locality'))
+    ) || data.results.find(r => 
+      r.address_components.some(c => c.types.includes('administrative_area_level_2'))
+    ) || data.results.find(r => 
+      r.address_components.some(c => c.types.includes('administrative_area_level_1'))
+    ) || data.results[0];
+
+    if (!result) {
+      // Fallback to coordinates if no proper result found
+      return {
+        coordinates: { lat: latitude, lng: longitude },
+        name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+        formattedAddress: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+      };
+    }
+
+    // Extract location components
+    const country = result.address_components.find(c => 
+      c.types.includes('country')
+    )?.long_name;
+    
+    const region = result.address_components.find(c => 
+      c.types.includes('administrative_area_level_1')
+    )?.long_name;
+
+    // Get city name - prefer locality, then administrative areas
+    const cityComponent = result.address_components.find(c => 
+      c.types.includes('locality')
+    ) || result.address_components.find(c => 
+      c.types.includes('administrative_area_level_2')  
+    ) || result.address_components.find(c => 
+      c.types.includes('administrative_area_level_1')
+    );
+
+    const cityName = cityComponent?.long_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
+    return {
+      name: cityName,
+      formattedAddress: result.formatted_address,
+      coordinates: {
+        lat: result.geometry.location.lat,
+        lng: result.geometry.location.lng
+      },
+      placeId: result.place_id,
+      country,
+      region
+    };
+
+  } catch (error) {
+    if (error instanceof MapsServiceError) {
+      throw error;
+    }
+
+    console.error('Reverse geocoding error:', error);
+    // Return fallback information instead of throwing
+    // This ensures graceful degradation when reverse geocoding fails
+    return {
+      coordinates: { lat: latitude, lng: longitude },
+      name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+      formattedAddress: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+    };
+  }
+}
+
 export { MapsServiceError };
