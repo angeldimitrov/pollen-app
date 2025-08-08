@@ -53,7 +53,7 @@ export function LocationCard({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm animate-pulse">
+      <div className="card animate-pulse">
         <div className="h-6 bg-gray-200 rounded mb-4"></div>
         <div className="space-y-2">
           <div className="h-4 bg-gray-200 rounded"></div>
@@ -65,15 +65,15 @@ export function LocationCard({
 
   return (
     <>
-      <div className="bg-white rounded-lg p-6 shadow-sm">
+      <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Location</h2>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Location</h2>
           
           {/* GPS detection button - only show when GPS is supported */}
           {onLocationDetect && (
             <button
               onClick={onLocationDetect}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+              className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
               aria-label="Detect GPS location"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

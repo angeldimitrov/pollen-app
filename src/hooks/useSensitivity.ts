@@ -82,8 +82,8 @@ const SENSITIVITY_CONFIG = {
   // Default values
   defaultValue: 5,
   
-  // Debounce delay for auto-save
-  autoSaveDelay: 1000, // 1 second
+  // Debounce delay for auto-save and data refresh
+  autoSaveDelay: 800, // 800ms - responsive but prevents excessive API calls
   
   // Text labels for sensitivity levels
   labels: {
@@ -197,11 +197,9 @@ export function useSensitivity(options: {
       error: isValid ? null : 'Invalid sensitivity values',
     });
     
-    // Notify change callback
-    if (isValid) {
-      onSensitivityChange?.(newSensitivity);
-    }
-  }, [originalSensitivity, validateSensitivity, updateState, onSensitivityChange]);
+    // Note: onSensitivityChange callback is now debounced via useEffect
+    // This prevents triggering data refresh on every slider step
+  }, [originalSensitivity, validateSensitivity, updateState]);
   
   /**
    * Sets tree pollen sensitivity
@@ -373,6 +371,22 @@ export function useSensitivity(options: {
     
     return () => clearTimeout(timeoutId);
   }, [autoSave, state.hasChanges, state.isValid, state.isLoading, saveChanges]);
+
+  /**
+   * Debounced sensitivity change callback
+   * Only triggers data refresh after user finishes adjusting sliders
+   */
+  useEffect(() => {
+    if (!state.isValid || state.isLoading || !onSensitivityChange) {
+      return;
+    }
+    
+    const timeoutId = setTimeout(() => {
+      onSensitivityChange(state.sensitivity);
+    }, SENSITIVITY_CONFIG.autoSaveDelay);
+    
+    return () => clearTimeout(timeoutId);
+  }, [state.sensitivity, state.isValid, state.isLoading, onSensitivityChange]);
   
   return {
     // State

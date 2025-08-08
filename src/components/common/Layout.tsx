@@ -47,7 +47,7 @@ export function Layout({
 }: LayoutProps): React.JSX.Element {
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col safe-top safe-bottom">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-emerald-50/20 flex flex-col safe-top safe-bottom">
       {/* Status bar - fixed at top */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
         <StatusBar
