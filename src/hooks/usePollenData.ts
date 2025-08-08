@@ -109,8 +109,7 @@ export function usePollenData(options: {
   
   const { 
     onDataUpdate,
-    onError,
-    autoRefresh = false 
+    onError
   } = options;
   
   // State management
@@ -155,18 +154,6 @@ export function usePollenData(options: {
     }));
   }, []);
   
-  /**
-   * Sets error state and notifies error callback
-   */
-  const setError = useCallback((error: PollenError) => {
-    setState(prevState => ({ 
-      ...prevState,
-      error, 
-      isLoading: false, 
-      isRefreshing: false 
-    }));
-    onErrorRef.current?.(error);
-  }, []);
   
   /**
    * Processes raw pollen data with user sensitivity

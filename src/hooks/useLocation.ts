@@ -416,7 +416,7 @@ export function useLocation(options: {
       console.log('🎯 useLocation: Triggering auto-detection');
       detectLocation();
     }
-  }, [autoDetect, state.settings.useAutoDetection, state.location, state.isSupported]);
+  }, [autoDetect, state.settings.useAutoDetection, state.location, state.isSupported, detectLocation]);
   
   /**
    * Periodically check permission state
