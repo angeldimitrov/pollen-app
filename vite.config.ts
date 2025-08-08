@@ -48,6 +48,24 @@ export default defineConfig({
         headers: {
           'User-Agent': 'Pollen-Tracker-App/1.0'
         }
+      },
+      '/api/maps/places': {
+        target: 'https://maps.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/maps\/places/, '/maps/api/place'),
+        secure: true,
+        headers: {
+          'User-Agent': 'Pollen-Tracker-App/1.0'
+        }
+      },
+      '/api/maps/geocode': {
+        target: 'https://maps.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/maps\/geocode/, '/maps/api/geocode'),
+        secure: true,
+        headers: {
+          'User-Agent': 'Pollen-Tracker-App/1.0'
+        }
       }
     }
   }

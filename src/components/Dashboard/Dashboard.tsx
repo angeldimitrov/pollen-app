@@ -19,13 +19,16 @@ import { RiskIndicator } from './RiskIndicator';
 import { PollenBreakdown } from './PollenBreakdown';
 import { LocationCard } from './LocationCard';
 import { ActivityCard } from './ActivityCard';
+import { City } from '../../services/mapsService';
 
 interface DashboardProps {
   pollenData: ProcessedPollenData | null;
   location: Location | null;
   isLoading?: boolean;
+  hasLocationError?: boolean;
   onRefresh?: () => void;
   onLocationDetect?: () => void;
+  onCitySelect?: (city: City) => void;
 }
 
 /**
@@ -36,8 +39,10 @@ export function Dashboard({
   pollenData, 
   location, 
   isLoading = false,
+  hasLocationError = false,
   onRefresh, 
-  onLocationDetect 
+  onLocationDetect,
+  onCitySelect
 }: DashboardProps): React.JSX.Element {
   
   /**
@@ -118,7 +123,10 @@ export function Dashboard({
       {/* Location Card */}
       <LocationCard
         location={location}
+        isLoading={isLoading}
+        hasLocationError={hasLocationError}
         onLocationDetect={onLocationDetect}
+        onCitySelect={onCitySelect}
       />
       
       {/* Main Risk Indicator */}

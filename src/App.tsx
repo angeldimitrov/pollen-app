@@ -18,6 +18,7 @@ import { usePollenData } from './hooks/usePollenData';
 import { useSensitivity } from './hooks/useSensitivity';
 import { Location, LocationError, SensitivityProfile } from './types/user';
 import { PollenError } from './types/pollen';
+import { City } from './services/mapsService';
 
 /**
  * App navigation views
@@ -42,14 +43,12 @@ function App(): React.JSX.Element {
   // Stable callbacks to prevent infinite loops
   const onLocationChange = useCallback((location: Location) => {
     console.log('📍 Location changed:', location);
-    // Refresh pollen data when location changes significantly
-    if (pollenHookRef.current?.needsRefresh(location)) {
-      pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
-        tree: 5,
-        grass: 5, 
-        weed: 5
-      });
-    }
+    // Always refresh pollen data when location changes
+    pollenHookRef.current?.fetchData(location, sensitivityRef.current?.sensitivity || {
+      tree: 5,
+      grass: 5, 
+      weed: 5
+    });
   }, []);
   
   const onLocationError = useCallback((error: LocationError) => {
@@ -71,13 +70,32 @@ function App(): React.JSX.Element {
     // Show pollen errors as app-level errors since they're critical
     setAppError(error.message);
   }, []);
-  
+
   // Custom hooks for data management with stable callbacks
   const locationHook = useLocation({
     autoDetect: true,
     onLocationChange,
     onError: onLocationError,
   });
+
+  const onCitySelect = useCallback(async (city: City) => {
+    console.log('🏙️ City selected:', city);
+    
+    try {
+      // Clear any existing errors
+      setAppError(null);
+      
+      // Set the city location using the location hook
+      await locationHook.setCityLocation(city);
+      
+      // The location hook will trigger a pollen data fetch automatically
+      // via the onLocationChange callback
+      
+    } catch (error) {
+      console.error('Failed to set city location:', error);
+      setAppError('Failed to update location. Please try again.');
+    }
+  }, [locationHook]);
   
   const sensitivity = useSensitivity({
     autoSave: true,
@@ -157,8 +175,10 @@ function App(): React.JSX.Element {
             pollenData={pollenHook.current}
             location={locationHook.location}
             isLoading={pollenHook.isLoading || locationHook.isLoading}
+            hasLocationError={!!locationHook.error}
             onRefresh={pollenHook.refreshData}
             onLocationDetect={locationHook.detectLocation}
+            onCitySelect={onCitySelect}
           />
         );
         

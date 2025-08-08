@@ -25,6 +25,10 @@ export interface Location {
   state?: string;
   country?: string;
   displayName?: string; // Formatted location name for UI
+  formattedAddress?: string; // Full formatted address from Google Maps
+  source?: 'auto' | 'manual'; // How the location was obtained
+  timestamp?: Date; // When the location was determined
+  accuracy?: number | null; // Accuracy in meters (null for manual locations)
 }
 
 /**
