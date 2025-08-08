@@ -4,6 +4,7 @@
  * 
  * Manages overall app state and routing between Dashboard, Forecast, and Settings views
  * Implements mobile-first navigation with tab-based interface
+ * Now deployed on GitHub Pages!
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
