@@ -132,7 +132,7 @@ function App(): React.JSX.Element {
       console.log('🚀 Triggering initial data fetch from App.tsx');
       pollenHook.fetchData(locationHook.location, sensitivity.sensitivity);
     }
-  }, [locationHook.location, sensitivity.isLoading, sensitivity.sensitivity]);
+  }, [locationHook.location, sensitivity.isLoading, sensitivity.sensitivity, pollenHook]);
   
   /**
    * Navigation handler
